@@ -15,13 +15,16 @@ var daffBoilerPlate = function (responseA, responseB) {
 
     var flags = new daff.CompareFlags();
     flags.allow_nested_cells = true;
+    flags.ignore_whitespace = true;
     var highlighter = new daff.TableDiff(alignment, flags);
     highlighter.hilite(tableDiff);
 
 
     var diff2html = new daff.DiffRender();
     diff2html.render(tableDiff);
-    return '<style>' + fs.readFileSync('./daff2html.css', 'utf-8') + '</style>' + diff2html.html();
+    return '<style>' + diff2html.sampleCss() + '</style>' +
+        '<pre>' + JSON.stringify(highlighter.getSummary(), null, 2) + '</pre>' + '<hr />' +
+        '<div class="highlighter">' + diff2html.html() + '</div>';
 
 }
 if (process.argv.length < 4) {
@@ -29,6 +32,6 @@ if (process.argv.length < 4) {
     process.exit(1)
 }
 console.log(daffBoilerPlate(
-    Papa.parse(fs.readFileSync(process.argv[2], 'utf-8'),{delimiter: ","}).data,
-    Papa.parse(fs.readFileSync(process.argv[3], 'utf-8'),{delimiter: ","}).data
+    Papa.parse(fs.readFileSync(process.argv[2], 'utf-8'),{delimiter: ",", header: true}).data,
+    Papa.parse(fs.readFileSync(process.argv[3], 'utf-8'),{delimiter: ",", header: true}).data
 ))
